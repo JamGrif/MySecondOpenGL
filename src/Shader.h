@@ -11,11 +11,9 @@
 class Shader
 {
 public:
-	GLuint Program;
-
-	//Constructor generates shader on the fly
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
+	static GLuint CreateShader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	{
+		
 		//Retrieve the vertex/fragment source code from filePath
 		std::string vertexCode;
 		std::string fragmentCode;
@@ -53,6 +51,7 @@ public:
 		const GLchar* vShaderCode = vertexCode.c_str();
 		const GLchar* fShaderCode = fragmentCode.c_str();
 
+
 		//Compile our shader program
 		GLuint vertex, fragment;
 		GLint success;
@@ -87,17 +86,18 @@ public:
 		}
 
 		//Shader program
-		this->Program = glCreateProgram(); //Creates the program and returns the ID that points to it
-		glAttachShader(this->Program, vertex); //Attach both shaders to the new program
-		glAttachShader(this->Program, fragment);
-		glLinkProgram(this->Program); //Request the GLSL complier to ensure they are compatible
+		GLuint ID;
+		ID = glCreateProgram(); //Creates the program and returns the ID that points to it
+		glAttachShader(ID, vertex); //Attach both shaders to the new program
+		glAttachShader(ID, fragment);
+		glLinkProgram(ID); //Request the GLSL complier to ensure they are compatible
 
 		//Check for linking errors
-		glGetProgramiv(this->Program, GL_LINK_STATUS, &success);
+		glGetProgramiv(ID, GL_LINK_STATUS, &success);
 
 		if (!success)
 		{
-			glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
+			glGetProgramInfoLog(ID, 512, NULL, infoLog);
 			std::cout << "LINKING_FAILED" << infoLog << std::endl;
 		}
 
@@ -105,12 +105,7 @@ public:
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
 
-	}
-
-	//Uses the current shader
-	void Use()
-	{
-		glUseProgram(this->Program); //Loads the program onto the GPU
+		return ID;
 	}
 };
 #endif
